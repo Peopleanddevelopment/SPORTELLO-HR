@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111111">
+  <meta name="description" content="Questionario per definire l'ordine di priorità degli argomenti delle formazioni Teams.">
+  <title>Priorità Formazioni Teams</title>
+  <style>
+    :root {
+      --ink: #151515;
+      --muted: #66645f;
+      --paper: #ffffff;
+      --canvas: #f3f1ed;
+      --line: #d8d4cd;
+      --soft: #f8f7f4;
+      --accent: #c8102e;
+      --accent-dark: #980c22;
+      --success: #1f6b45;
+      --shadow: 0 18px 50px rgba(20, 18, 15, .10);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 100% 0, rgba(200, 16, 46, .07), transparent 28rem),
+        var(--canvas);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.45;
+    }
+
+    button, input { font: inherit; }
+
+    button { touch-action: manipulation; }
+
+    .skip-link {
+      position: fixed;
+      z-index: 100;
+      top: 10px;
+      left: 10px;
+      padding: 10px 14px;
+      color: #fff;
+      background: var(--ink);
+      transform: translateY(-160%);
+    }
+
+    .skip-link:focus { transform: translateY(0); }
+
+    .shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 60px;
+    }
+
+    .hero {
+      overflow: hidden;
+      position: relative;
+      padding: clamp(28px, 5vw, 62px);
+      color: #fff;
+      background: #111;
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 270px;
+      height: 270px;
+      right: -85px;
+      top: -105px;
+      border: 48px solid var(--accent);
+      border-radius: 50%;
+      opacity: .92;
+    }
+
+    .eyebrow {
+      margin: 0 0 16px;
+      color: #f4a7b5;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 0;
+      font-size: clamp(34px, 6vw, 66px);
+      line-height: .98;
+      letter-spacing: -.045em;
+    }
+
+    .hero p:last-child {
+      max-width: 690px;
+      margin: 22px 0 0;
+      color: #d8d8d8;
+      font-size: clamp(16px, 2vw, 20px);
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 310px;
+      gap: 24px;
+      align-items: start;
+      margin-top: 24px;
+    }
+
+    .panel {
+      padding: clamp(20px, 4vw, 36px);
+      background: var(--paper);
+      border: 1px solid rgba(21, 21, 21, .06);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 34px rgba(20, 18, 15, .06);
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 34px);
+      line-height: 1.08;
+      letter-spacing: -.025em;
+    }
+
+    .panel-intro {
+      margin: 10px 0 24px;
+      color: var(--muted);
+    }
+
+    .identity-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .required { color: var(--accent); }
+
+    input {
+      width: 100%;
+      min-height: 48px;
+      padding: 11px 13px;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--ink);
+      box-shadow: 0 0 0 3px rgba(21, 21, 21, .09);
+    }
+
+    .ranking-header {
+      display: flex;
+      gap: 16px;
+      justify-content: space-between;
+      align-items: end;
+      margin-bottom: 12px;
+    }
+
+    .ranking-header h2 {
+      margin: 0;
+      font-size: 19px;
+    }
+
+    .ranking-header p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .reset-btn, .text-btn {
+      padding: 8px 0;
+      color: var(--ink);
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid currentColor;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .rank-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .rank-card {
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      min-height: 82px;
+      padding: 12px 14px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      cursor: grab;
+      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+    }
+
+    .rank-card:hover {
+      border-color: #aaa59d;
+      box-shadow: 0 8px 22px rgba(20, 18, 15, .07);
+    }
+
+    .rank-card.dragging {
+      opacity: .45;
+      transform: scale(.985);
+    }
+
+    .rank-number {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      color: #fff;
+      background: var(--ink);
+      border-radius: 50%;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .rank-card:first-child .rank-number { background: var(--accent); }
+
+    .topic-title {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    details { margin-top: 5px; }
+
+    summary {
+      width: max-content;
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .topic-details {
+      margin: 8px 0 2px;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .topic-details li + li { margin-top: 4px; }
+
+    .move-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .move-btn {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .move-btn:hover:not(:disabled), .move-btn:focus-visible:not(:disabled) {
+      color: #fff;
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .move-btn:disabled { opacity: .28; cursor: not-allowed; }
+
+    .submit-area {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 26px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+    }
+
+    .primary-btn {
+      min-height: 52px;
+      padding: 13px 24px;
+      color: #fff;
+      background: var(--accent);
+      border: 0;
+      border-radius: 10px;
+      font-weight: 800;
+      letter-spacing: .02em;
+      cursor: pointer;
+    }
+
+    .primary-btn:hover { background: var(--accent-dark); }
+    .primary-btn:disabled { opacity: .55; cursor: wait; }
+
+    .privacy-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .guide {
+      position: sticky;
+      top: 20px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .step + .step { margin-top: 20px; }
+
+    .step-num {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      color: #fff;
+      background: var(--ink);
+      border-radius: 50%;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .step h3 { margin: 1px 0 4px; font-size: 14px; }
+    .step p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .priority-key {
+      margin-top: 24px;
+      padding: 16px;
+      background: #fff4f6;
+      border-left: 3px solid var(--accent);
+      border-radius: 0 10px 10px 0;
+      font-size: 13px;
+    }
+
+    .priority-key strong { color: var(--accent-dark); }
+
+    .status {
+      min-height: 22px;
+      margin: 14px 0 0;
+      color: var(--success);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .modal {
+      width: min(720px, calc(100% - 24px));
+      max-height: calc(100vh - 32px);
+      padding: 0;
+      border: 0;
+      border-radius: 18px;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, .35);
+    }
+
+    .modal::backdrop { background: rgba(0, 0, 0, .58); }
+
+    .modal-inner { padding: clamp(22px, 4vw, 36px); }
+    .modal h2 { margin: 0 0 8px; font-size: 28px; }
+    .modal-intro { margin: 0 0 18px; color: var(--muted); }
+
+    .summary-box {
+      max-height: 46vh;
+      overflow: auto;
+      margin: 0;
+      padding: 16px;
+      white-space: pre-wrap;
+      color: var(--ink);
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font: 13px/1.55 Arial, Helvetica, sans-serif;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .secondary-btn {
+      min-height: 46px;
+      padding: 10px 16px;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .secondary-btn:hover { border-color: var(--ink); }
+
+    footer {
+      margin-top: 26px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 12px;
+    }
+
+    @media (max-width: 850px) {
+      .content { grid-template-columns: 1fr; }
+      .guide { position: static; order: -1; }
+      .guide .panel-intro { margin-bottom: 20px; }
+      .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+      .step + .step { margin-top: 0; }
+    }
+
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 20px, 1120px); padding-top: 10px; }
+      .hero { border-radius: 18px; }
+      .hero::after { width: 150px; height: 150px; right: -75px; top: -70px; border-width: 28px; }
+      .content { margin-top: 10px; gap: 10px; }
+      .panel { border-radius: 15px; }
+      .steps { grid-template-columns: 1fr; gap: 16px; }
+      .identity-grid { grid-template-columns: 1fr; }
+      .ranking-header { align-items: start; }
+      .rank-card { grid-template-columns: 42px minmax(0, 1fr); gap: 10px; padding: 12px 10px; cursor: default; }
+      .rank-number { width: 40px; height: 40px; }
+      .move-controls { grid-column: 2; justify-content: flex-end; }
+      .move-btn { width: 44px; height: 40px; }
+      .submit-area { align-items: stretch; flex-direction: column; }
+      .primary-btn { width: 100%; }
+      .modal-actions { flex-direction: column; }
+      .modal-actions button { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#questionario">Vai al questionario</a>
+
+  <main class="shell">
+    <header class="hero">
+      <p class="eyebrow">Questionario · Formazioni Teams</p>
+      <h1>Quali argomenti affrontiamo prima?</h1>
+      <p>Aiutaci a costruire un percorso davvero utile: ordina gli 11 argomenti dal più urgente al meno urgente per la tua realtà lavorativa.</p>
+    </header>
+
+    <div class="content">
+      <section class="panel" id="questionario" aria-labelledby="form-title">
+        <h2 class="panel-title" id="form-title">La tua classifica</h2>
+        <p class="panel-intro">Compila i dati e modifica l'ordine degli argomenti. La posizione 1 indica la priorità più alta.</p>
+
+        <form id="priorityForm" novalidate>
+          <div class="identity-grid">
+            <div>
+              <label for="fullName">Nome e cognome <span class="required" aria-hidden="true">*</span></label>
+              <input id="fullName" name="fullName" autocomplete="name" required placeholder="Es. Mario Rossi">
+            </div>
+            <div>
+              <label for="workplace">Negozio / sede <span class="required" aria-hidden="true">*</span></label>
+              <input id="workplace" name="workplace" required placeholder="Es. Zara Milano Duomo">
+            </div>
+            <div>
+              <label for="role">Ruolo</label>
+              <input id="role" name="role" autocomplete="organization-title" placeholder="Es. Store Manager">
+            </div>
+            <div>
+              <label for="email">E-mail</label>
+              <input id="email" name="email" type="email" autocomplete="email" placeholder="nome.cognome@azienda.com">
+            </div>
+          </div>
+
+          <div class="ranking-header">
+            <div>
+              <h2>Ordina gli argomenti</h2>
+              <p>Trascina una scheda oppure usa le frecce.</p>
+            </div>
+            <button class="reset-btn" id="resetOrder" type="button">Ripristina</button>
+          </div>
+
+          <ol class="rank-list" id="rankList" aria-label="Classifica degli argomenti formativi"></ol>
+          <div class="status" id="liveStatus" role="status" aria-live="polite"></div>
+
+          <div class="submit-area">
+            <button class="primary-btn" id="submitBtn" type="submit">CONFERMA PRIORITÀ</button>
+            <p class="privacy-note">I dati vengono utilizzati esclusivamente per organizzare il piano formativo.</p>
+          </div>
+        </form>
+      </section>
+
+      <aside class="panel guide" aria-labelledby="guide-title">
+        <h2 class="panel-title" id="guide-title">Come funziona</h2>
+        <p class="panel-intro">Bastano pochi minuti.</p>
+        <div class="steps">
+          <div class="step">
+            <span class="step-num">1</span>
+            <div><h3>Leggi</h3><p>Apri “Vedi cosa comprende” per consultare gli esempi.</p></div>
+          </div>
+          <div class="step">
+            <span class="step-num">2</span>
+            <div><h3>Ordina</h3><p>Porta in alto ciò che ritieni più urgente o utile.</p></div>
+          </div>
+          <div class="step">
+            <span class="step-num">3</span>
+            <div><h3>Conferma</h3><p>Controlla il riepilogo e invia la tua classifica.</p></div>
+          </div>
+        </div>
+        <div class="priority-key"><strong>Priorità 1</strong> = l'argomento da affrontare per primo.</div>
+      </aside>
+    </div>
+
+    <footer>Questionario priorità · Formazioni Teams</footer>
+  </main>
+
+  <dialog class="modal" id="summaryModal" aria-labelledby="summary-title">
+    <div class="modal-inner">
+      <h2 id="summary-title">Classifica pronta</h2>
+      <p class="modal-intro" id="modalIntro">Controlla il riepilogo prima di inviarlo.</p>
+      <pre class="summary-box" id="summaryText"></pre>
+      <div class="modal-actions">
+        <button class="primary-btn" id="sendEmail" type="button">INVIA VIA E-MAIL</button>
+        <button class="secondary-btn" id="copySummary" type="button">Copia riepilogo</button>
+        <button class="secondary-btn" id="downloadCsv" type="button">Scarica CSV</button>
+        <button class="secondary-btn" id="closeModal" type="button">Modifica</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    /*
+      CONFIGURAZIONE PER GITHUB PAGES
+      1) recipientEmail: inserire l'indirizzo che deve ricevere le risposte.
+      2) powerAutomateUrl: opzionale. Se compilato, il pulsante invia i dati al flow.
+         Lasciare vuoto per usare e-mail, copia riepilogo o download CSV.
+    */
+    const CONFIG = {
+      recipientEmail: "",
+      powerAutomateUrl: ""
+    };
+
+    const topics = [
+      {
+        id: "festivita",
+        title: "Gestione orari in caso di festività",
+        details: [
+          "Teorico settimanale con festività infrasettimanale per orari orizzontali e verticali",
+          "Gestione della settimana di Pasqua",
+          "Pianificazione in caso di festivo domenicale",
+          "Esempi concreti di pianificazione corretta e sbagliata"
+        ]
+      },
+      {
+        id: "maternita",
+        title: "Maternità anticipata e obbligatoria: primi passi",
+        details: [
+          "Cosa fare quando viene dichiarato lo stato di gravidanza, a rischio o non a rischio",
+          "Documenti da richiedere all'inizio dell'obbligatoria e dopo il parto",
+          "Congedo di paternità"
+        ]
+      },
+      {
+        id: "parentale",
+        title: "Congedo parentale",
+        details: [
+          "Documenti che deve fornire la dipendente",
+          "Casi concreti",
+          "Controlli a cura del responsabile",
+          "Attività gestite dall'amministrazione del personale"
+        ]
+      },
+      {
+        id: "ferie-rol",
+        title: "Maturazione ferie e ROL",
+        details: [
+          "Disponibilità per un dipendente neoassunto e variazioni dopo 2 o 4 anni",
+          "Riproporzionamento in base all'orario contrattuale",
+          "Dove visualizzare il saldo e come leggerlo in busta paga",
+          "Errori da evitare nella pianificazione mensile"
+        ]
+      },
+      {
+        id: "infortunio",
+        title: "Infortunio",
+        details: [
+          "Cosa fare in caso di infortunio in negozio o in itinere",
+          "Documenti da fornire e moduli da compilare",
+          "Gestione della proroga e del rientro in negozio"
+        ]
+      },
+      {
+        id: "studio-formazione",
+        title: "Permessi studio/esame, congedo per formazione e permessi 150 ore",
+        details: [
+          "Come gestire i permessi richiesti da un dipendente studente",
+          "Documenti che il dipendente deve fornire"
+        ]
+      },
+      {
+        id: "permessi-vari",
+        title: "Permessi vari",
+        details: [
+          "Lutto, matrimonio, attività elettorale e donazione sangue",
+          "Documenti richiesti e giorni disponibili per ciascun permesso"
+        ]
+      },
+      {
+        id: "variazioni-orarie",
+        title: "Variazioni orarie e variazioni a cavallo di mese",
+        details: [
+          "Variazioni orarie con o senza temporaneità",
+          "Passaggi da full time a part time",
+          "Pianificazione quando la variazione avviene a cavallo di mese"
+        ]
+      },
+      {
+        id: "contratti",
+        title: "Blocchi 11-22 mesi dei contratti e causali sostitutive",
+        details: [
+          "Limiti dei contratti acausali e con causali sostitutive",
+          "Conteggio dei mesi lavorati con agenzie interinali",
+          "Numero di proroghe disponibili"
+        ]
+      },
+      {
+        id: "malattia",
+        title: "Gestione dell'evento di malattia",
+        details: [
+          "Comunicazioni al dipendente e all'amministrazione",
+          "Documenti telematici o cartacei da fornire",
+          "Ricovero ospedaliero e mancata consegna del certificato medico"
+        ]
+      },
+      {
+        id: "ticket",
+        title: "Ticket: valore, ordine e mancata ricezione della tessera",
+        details: [
+          "Differenza tra ticket da 5 e 7 euro",
+          "Quando vengono ordinati e a quale mese fanno riferimento",
+          "Tempi per i nuovi assunti",
+          "Mancata ricezione o smarrimento della tessera"
+        ]
+      }
+    ];
+
+    const originalOrder = topics.map(topic => topic.id);
+    let order = loadDraftOrder();
+    let draggedId = null;
+
+    const list = document.getElementById("rankList");
+    const form = document.getElementById("priorityForm");
+    const liveStatus = document.getElementById("liveStatus");
+    const modal = document.getElementById("summaryModal");
+    const summaryText = document.getElementById("summaryText");
+    const submitBtn = document.getElementById("submitBtn");
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>'"]/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
+      })[char]);
+    }
+
+    function topicById(id) {
+      return topics.find(topic => topic.id === id);
+    }
+
+    function loadDraftOrder() {
+      try {
+        const saved = JSON.parse(localStorage.getItem("teamsPriorityOrder"));
+        if (Array.isArray(saved) && saved.length === originalOrder.length && originalOrder.every(id => saved.includes(id))) {
+          return saved;
+        }
+      } catch (error) { /* usa l'ordine iniziale */ }
+      return [...originalOrder];
+    }
+
+    function saveDraft() {
+      try {
+        localStorage.setItem("teamsPriorityOrder", JSON.stringify(order));
+        ["fullName", "workplace", "role", "email"].forEach(id => {
+          localStorage.setItem(`teamsPriority_${id}`, document.getElementById(id).value);
+        });
+      } catch (error) { /* localStorage non disponibile */ }
+    }
+
+    function restoreFields() {
+      try {
+        ["fullName", "workplace", "role", "email"].forEach(id => {
+          document.getElementById(id).value = localStorage.getItem(`teamsPriority_${id}`) || "";
+        });
+      } catch (error) { /* localStorage non disponibile */ }
+    }
+
+    function renderList(focusId = null) {
+      list.innerHTML = order.map((id, index) => {
+        const topic = topicById(id);
+        const detailItems = topic.details.map(item => `<li>${escapeHtml(item)}</li>`).join("");
+        return `
+          <li class="rank-card" draggable="true" data-id="${topic.id}">
+            <span class="rank-number" aria-label="Priorità ${index + 1}">${index + 1}</span>
+            <div>
+              <h3 class="topic-title">${escapeHtml(topic.title)}</h3>
+              <details>
+                <summary>Vedi cosa comprende</summary>
+                <ul class="topic-details">${detailItems}</ul>
+              </details>
+            </div>
+            <div class="move-controls" aria-label="Sposta ${escapeHtml(topic.title)}">
+              <button class="move-btn move-up" type="button" data-id="${topic.id}" ${index === 0 ? "disabled" : ""} aria-label="Sposta su">↑</button>
+              <button class="move-btn move-down" type="button" data-id="${topic.id}" ${index === order.length - 1 ? "disabled" : ""} aria-label="Sposta giù">↓</button>
+            </div>
+          </li>`;
+      }).join("");
+
+      attachListEvents();
+      if (focusId) {
+        const control = list.querySelector(`[data-id="${focusId}"].move-up`) || list.querySelector(`[data-id="${focusId}"] button`);
+        control?.focus({ preventScroll: true });
+      }
+      saveDraft();
+    }
+
+    function move(id, direction) {
+      const current = order.indexOf(id);
+      const target = current + direction;
+      if (target < 0 || target >= order.length) return;
+      [order[current], order[target]] = [order[target], order[current]];
+      renderList(id);
+      const topic = topicById(id);
+      liveStatus.textContent = `${topic.title}: ora è alla priorità ${target + 1}.`;
+    }
+
+    function attachListEvents() {
+      list.querySelectorAll(".move-up").forEach(button => button.addEventListener("click", () => move(button.dataset.id, -1)));
+      list.querySelectorAll(".move-down").forEach(button => button.addEventListener("click", () => move(button.dataset.id, 1)));
+
+      list.querySelectorAll(".rank-card").forEach(card => {
+        card.addEventListener("dragstart", event => {
+          draggedId = card.dataset.id;
+          card.classList.add("dragging");
+          event.dataTransfer.effectAllowed = "move";
+          event.dataTransfer.setData("text/plain", draggedId);
+        });
+        card.addEventListener("dragend", () => {
+          card.classList.remove("dragging");
+          draggedId = null;
+        });
+        card.addEventListener("dragover", event => event.preventDefault());
+        card.addEventListener("drop", event => {
+          event.preventDefault();
+          const sourceId = draggedId || event.dataTransfer.getData("text/plain");
+          const targetId = card.dataset.id;
+          if (!sourceId || sourceId === targetId) return;
+          const sourceIndex = order.indexOf(sourceId);
+          const targetIndex = order.indexOf(targetId);
+          order.splice(sourceIndex, 1);
+          order.splice(targetIndex, 0, sourceId);
+          renderList();
+          liveStatus.textContent = `${topicById(sourceId).title}: ora è alla priorità ${targetIndex + 1}.`;
+        });
+      });
+    }
+
+    function getResponse() {
+      return {
+        submittedAt: new Date().toISOString(),
+        fullName: document.getElementById("fullName").value.trim(),
+        workplace: document.getElementById("workplace").value.trim(),
+        role: document.getElementById("role").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        priorities: order.map((id, index) => ({
+          priority: index + 1,
+          id,
+          topic: topicById(id).title
+        }))
+      };
+    }
+
+    function buildSummary(response) {
+      const lines = [
+        "PRIORITÀ FORMAZIONI TEAMS",
+        "",
+        `Nome e cognome: ${response.fullName}`,
+        `Negozio / sede: ${response.workplace}`,
+        `Ruolo: ${response.role || "Non indicato"}`,
+        `E-mail: ${response.email || "Non indicata"}`,
+        "",
+        "CLASSIFICA",
+        ...response.priorities.map(item => `${item.priority}. ${item.topic}`)
+      ];
+      return lines.join("\n");
+    }
+
+    function csvEscape(value) {
+      return `"${String(value ?? "").replace(/"/g, '""')}"`;
+    }
+
+    function downloadCsvFile(response) {
+      const headers = ["Data invio", "Nome e cognome", "Negozio / sede", "Ruolo", "E-mail", ...response.priorities.map(p => `Priorità ${p.priority}`)];
+      const row = [response.submittedAt, response.fullName, response.workplace, response.role, response.email, ...response.priorities.map(p => p.topic)];
+      const csv = "\uFEFF" + headers.map(csvEscape).join(";") + "\r\n" + row.map(csvEscape).join(";");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `priorita_formazioni_${response.fullName.replace(/[^a-z0-9]+/gi, "_").toLowerCase() || "risposta"}.csv`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function submitToFlow(response) {
+      const request = await fetch(CONFIG.powerAutomateUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(response)
+      });
+      if (!request.ok) throw new Error(`Invio non riuscito (${request.status})`);
+    }
+
+    form.addEventListener("input", saveDraft);
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const response = getResponse();
+      const summary = buildSummary(response);
+
+      if (CONFIG.powerAutomateUrl) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "INVIO IN CORSO…";
+        liveStatus.textContent = "";
+        try {
+          await submitToFlow(response);
+          summaryText.textContent = summary;
+          document.getElementById("modalIntro").textContent = "Grazie: la tua classifica è stata inviata correttamente.";
+          document.getElementById("sendEmail").hidden = true;
+          modal.showModal();
+          liveStatus.textContent = "Classifica inviata correttamente.";
+        } catch (error) {
+          liveStatus.textContent = "Non è stato possibile inviare. Puoi usare il riepilogo via e-mail.";
+          summaryText.textContent = summary;
+          document.getElementById("modalIntro").textContent = "L'invio automatico non è riuscito. Invia il riepilogo via e-mail o scarica il CSV.";
+          document.getElementById("sendEmail").hidden = false;
+          modal.showModal();
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "CONFERMA PRIORITÀ";
+        }
+      } else {
+        summaryText.textContent = summary;
+        document.getElementById("modalIntro").textContent = "Controlla il riepilogo, poi invialo via e-mail oppure scaricalo.";
+        document.getElementById("sendEmail").hidden = false;
+        modal.showModal();
+      }
+    });
+
+    document.getElementById("resetOrder").addEventListener("click", () => {
+      order = [...originalOrder];
+      renderList();
+      liveStatus.textContent = "Ordine iniziale ripristinato.";
+    });
+
+    document.getElementById("closeModal").addEventListener("click", () => modal.close());
+
+    document.getElementById("copySummary").addEventListener("click", async event => {
+      try {
+        await navigator.clipboard.writeText(summaryText.textContent);
+        event.currentTarget.textContent = "Copiato!";
+        setTimeout(() => { event.currentTarget.textContent = "Copia riepilogo"; }, 1800);
+      } catch (error) {
+        summaryText.focus();
+        window.getSelection()?.selectAllChildren(summaryText);
+      }
+    });
+
+    document.getElementById("downloadCsv").addEventListener("click", () => downloadCsvFile(getResponse()));
+
+    document.getElementById("sendEmail").addEventListener("click", () => {
+      const response = getResponse();
+      const subject = `Priorità Formazioni Teams - ${response.fullName}`;
+      const href = `mailto:${encodeURIComponent(CONFIG.recipientEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(buildSummary(response))}`;
+      window.location.href = href;
+    });
+
+    modal.addEventListener("click", event => {
+      if (event.target === modal) modal.close();
+    });
+
+    restoreFields();
+    renderList();
+  </script>
+</body>
+</html>
